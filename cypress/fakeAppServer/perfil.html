@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Perfil de Usuario</title>
+  <style>
+    .loader {
+      font-weight: bold;
+      color: #888;
+    }
+    .resultado {
+      font-weight: bold;
+      color: green;
+    }
+    .hidden {
+      display: none;
+    }
+    table {
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+    }
+    #mensaje {
+      color: blue;
+      margin-top: 10px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>Perfil</h1>
+
+  <!-- Loader visible inicialmente -->
+  <div class="loader" id="loader">Cargando...</div>
+
+  <!-- Resultado oculto inicialmente -->
+  <div class="resultado" id="user" style="display: none;"></div>
+
+  <!-- Formulario editable -->
+  <form id="perfil-form" class="hidden">
+    <label>
+      Nombre:
+      <input type="text" id="nombre" value="Juan Pérez" />
+    </label>
+    <br /><br />
+    <label>
+      Email:
+      <input type="email" id="email" value="juan@example.com" />
+    </label>
+    <br /><br />
+    <button type="submit">Actualizar</button>
+  </form>
+
+  <!-- Tabla de actividades -->
+  <h2 class="hidden" id="tabla-titulo">Actividades Recientes</h2>
+  <table class="hidden" id="tabla-actividades">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Actividad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2024-09-10</td>
+        <td>Inicio de sesión</td>
+      </tr>
+      <tr>
+        <td>2024-09-09</td>
+        <td>Actualizó su perfil</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Botón dinámico -->
+  <button id="mostrar-mensaje" class="hidden">Mostrar mensaje</button>
+  <div id="mensaje" class="hidden">Bienvenido de nuevo, Juan 👋</div>
+
+  <script>
+    // Simular fetch con retraso (puede ser interceptado por Cypress)
+    fetch('https://jsonplaceholder.typicode.com/users/1')
+      .then(res => res.json())
+      .then(data => {
+        // Ocultar loader
+        document.getElementById('loader').remove();
+
+        // Mostrar resultado
+        const userDiv = document.getElementById('user');
+        userDiv.textContent = `Completado: ${data.name}`;
+        userDiv.style.display = 'block';
+
+        // Mostrar formulario y tabla
+        document.getElementById('perfil-form').classList.remove('hidden');
+        document.getElementById('tabla-actividades').classList.remove('hidden');
+        document.getElementById('tabla-titulo').classList.remove('hidden');
+        document.getElementById('mostrar-mensaje').classList.remove('hidden');
+      });
+
+    // Mostrar mensaje dinámico
+    document.getElementById('mostrar-mensaje').addEventListener('click', () => {
+      document.getElementById('mensaje').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>
