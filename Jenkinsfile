@@ -3,6 +3,7 @@ pipeline {
 
   environment {
     CI = 'true'  // Enables Cypress to run in Continuous Integration mode
+    PATH = "/opt/homebrew/bin:$PATH"
   }
 
   stages {
