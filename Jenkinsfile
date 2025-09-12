@@ -21,7 +21,7 @@ pipeline {
         sh 'npx http-server ./cypress/fakeAppServer -p 8080 &'
 
         // Wait 5 seconds to ensure the server is ready before running tests
-        sh 'sleep 5'
+        sh 'sleep 10'
       }
     }
 
