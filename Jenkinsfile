@@ -15,16 +15,18 @@ pipeline {
     }
 
     stage('Start local server') {
-      steps {
-        // Start a local HTTP server to serve the fake HTML app
-        // & runs it in the background
-        sh 'npx http-server ./cypress/fakeAppServer -p 8080 &'
+    steps {
+        // ✅ Start a local HTTP server to serve the fake HTML app
+        // - Uses port 8081 to avoid conflict with Jenkins (which uses 8080)    
+        // - Enables CORS and disables caching
+        // - Runs in the background with '&'
+        sh 'npx http-server ./cypress/fakeAppServer -p 8081 --cors -a 127.0.0.1 -c-1 &'
 
-        // Wait 5 seconds to ensure the server is ready before running tests
+        // ⏳ Wait to ensure the server is fully ready before tests start
         sh 'sleep 10'
-      }
     }
-
+    }
+    
     stage('Run Cypress tests') {
       steps {
         // Run only the Cypress tests inside the fakeAppTest group
