@@ -1,15 +1,22 @@
-import { defineConfig } from 'cypress';
+import { defineConfig } from 'cypress'
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:8081', // ✅ Servimos desde la raíz del proyecto http://localhost:8080/perfil.html
-
+    baseUrl: 'http://localhost:8081',
     setupNodeEvents(on, config) {
-      // You can customize event hooks here if needed
-    },
-    screenshotOnRunFailure: true,
-    video: true,
-    videosFolder: 'cypress/videos',
-    screenshotsFolder: 'cypress/screenshots'
-  }
-});
+      // Puedes agregar otros hooks aquí si lo necesitás
+    }
+  },
+
+  // ✅ Configuramos mochawesome como el reporter
+  reporter: 'mochawesome',
+  reporterOptions: {
+    reportDir: 'cypress/reports/json',   // 🗂️ Carpeta donde se guardan los .json
+    overwrite: false,
+    html: false,
+    json: true
+  },
+
+  video: true,
+  screenshotOnRunFailure: true
+})

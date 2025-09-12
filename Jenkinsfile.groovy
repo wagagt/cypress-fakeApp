@@ -31,7 +31,12 @@ pipeline {
         sh 'rm -rf cypress/reports/json/*.json cypress/reports/html'
 
         // Ejecuta Cypress con reporter mochawesome
-        sh 'npx cypress run --spec "cypress/e2e/fakeAppTest/**/*.cy.js" --reporter mochawesome --reporter-options reportDir=cypress/reports/json,overwrite=false,html=false,json=true'
+        sh '''
+          npx cypress run \\
+            --spec "cypress/e2e/fakeAppTest/**/*.cy.js" \\
+            --reporter mochawesome \\
+            --reporter-options reportDir=cypress/reports/json,overwrite=false,html=false,json=true
+        '''
       }
     }
 
@@ -40,19 +45,19 @@ pipeline {
         echo '📄 Generating mochawesome HTML report...'
 
         sh '''
-          npx mochawesome-merge cypress/reports/json/mochawesome_*.json > cypress/reports/json/mochawesome.json
-          npx marge cypress/reports/json/mochawesome.json --reportDir cypress/reports/html
+          npx mochawesome-merge cypress/reports/json/mochawesome_*.json > cypress/reports/json/mochawesome-${BUILD_TS}.json
+          npx marge cypress/reports/json/mochawesome-${BUILD_TS}.json --reportDir cypress/reports/html --reportFilename mochawesome-${BUILD_TS}
         '''
       }
     }
 
     stage('Archive Test Artifacts') {
       steps {
-        echo '📎 Archiving videos, screenshots, and HTML report...'
-
+        echo '📎 Archiving report artifacts...'
+        archiveArtifacts artifacts: 'cypress/reports/html/*.html', fingerprint: true
+        archiveArtifacts artifacts: 'cypress/reports/json/*.json', fingerprint: true
         archiveArtifacts artifacts: 'cypress/videos/**/*', allowEmptyArchive: true
         archiveArtifacts artifacts: 'cypress/screenshots/**/*', allowEmptyArchive: true
-        archiveArtifacts artifacts: 'cypress/reports/html/*.html', allowEmptyArchive: true
       }
     }
   }
