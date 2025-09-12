@@ -4,11 +4,9 @@ pipeline {
   environment {
     CI = 'true'
     PATH = "/opt/homebrew/bin:$PATH"
-    BUILD_TS = "${new Date().format('yyyyMMdd-HHmmss')}"
   }
 
   stages {
-
     stage('Install dependencies') {
       steps {
         echo '📦 Installing dependencies...'
@@ -28,10 +26,8 @@ pipeline {
       steps {
         echo '🧪 Running Cypress tests with Mochawesome reporter...'
 
-        // Borrar reportes anteriores
         sh 'rm -rf cypress/reports/json/*.json cypress/reports/html'
 
-        // Ejecutar Cypress con reporter mochawesome
         sh '''
           npx cypress run \
             --spec "cypress/e2e/fakeAppTest/**/*.cy.js" \
@@ -45,20 +41,15 @@ pipeline {
       steps {
         echo '📄 Generating mochawesome HTML report...'
 
-        // Verifica si hay múltiples archivos para mergear
-        sh '''
-          JSON_COUNT=$(ls cypress/reports/json/mochawesome*.json | wc -l)
-          
-          if [ "$JSON_COUNT" -gt 1 ]; then
-            npx mochawesome-merge cypress/reports/json/mochawesome*.json > cypress/reports/json/mochawesome-${BUILD_TS}.json
-          else
-            cp cypress/reports/json/mochawesome*.json cypress/reports/json/mochawesome-${BUILD_TS}.json
-          fi
-
-          npx marge cypress/reports/json/mochawesome-${BUILD_TS}.json \
-            --reportDir cypress/reports/html \
-            --reportFilename mochawesome-${BUILD_TS}
-        '''
+        script {
+          def ts = new Date().format("yyyyMMdd-HHmmss")
+          sh """
+            npx mochawesome-merge cypress/reports/json/mochawesome*.json > cypress/reports/json/mochawesome-${ts}.json
+            npx marge cypress/reports/json/mochawesome-${ts}.json \
+              --reportDir cypress/reports/html \
+              --reportFilename mochawesome-${ts}
+          """
+        }
       }
     }
 
