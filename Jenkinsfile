@@ -1,49 +1,67 @@
 pipeline {
-  agent any  // This tells Jenkins to run the pipeline on any available agent (machine)
+  agent any
 
   environment {
-    CI = 'true'  // Enables Cypress to run in Continuous Integration mode
+    CI = 'true'
     PATH = "/opt/homebrew/bin:$PATH"
   }
 
   stages {
     stage('Install dependencies') {
       steps {
-        // Install dependencies defined in package-lock.json
+        echo '📦 Installing dependencies...'
         sh 'npm ci'
       }
     }
 
     stage('Start local server') {
-    steps {
-        // ✅ Start a local HTTP server to serve the fake HTML app
-        // - Uses port 8081 to avoid conflict with Jenkins (which uses 8080)    
-        // - Enables CORS and disables caching
-        // - Runs in the background with '&'
+      steps {
+        echo '🚀 Starting local server for fakeApp...'
         sh 'npx http-server ./cypress/fakeAppServer -p 8081 --cors -a 127.0.0.1 -c-1 &'
-
-        // ⏳ Wait to ensure the server is fully ready before tests start
         sh 'sleep 10'
+      }
     }
-    }
-    
+
     stage('Run Cypress tests') {
       steps {
-        // Run only the Cypress tests inside the fakeAppTest group
-        sh 'npx cypress run --spec "cypress/e2e/fakeAppTest/**/*.cy.js"'
+        echo '🧪 Running Cypress tests with Mochawesome reporter...'
+
+        // Limpia reportes anteriores
+        sh 'rm -rf cypress/reports/json/*.json cypress/reports/html'
+
+        // Ejecuta Cypress con reporter mochawesome
+        sh 'npx cypress run --spec "cypress/e2e/fakeAppTest/**/*.cy.js" --reporter mochawesome --reporter-options reportDir=cypress/reports/json,overwrite=false,html=false,json=true'
+      }
+    }
+
+    stage('Generate HTML Report') {
+      steps {
+        echo '📄 Generating mochawesome HTML report...'
+
+        sh '''
+          npx mochawesome-merge cypress/reports/json/mochawesome_*.json > cypress/reports/json/mochawesome.json
+          npx marge cypress/reports/json/mochawesome.json --reportDir cypress/reports/html
+        '''
+      }
+    }
+
+    stage('Archive Test Artifacts') {
+      steps {
+        echo '📎 Archiving videos, screenshots, and HTML report...'
+
+        archiveArtifacts artifacts: 'cypress/videos/**/*', allowEmptyArchive: true
+        archiveArtifacts artifacts: 'cypress/screenshots/**/*', allowEmptyArchive: true
+        archiveArtifacts artifacts: 'cypress/reports/html/*.html', allowEmptyArchive: true
       }
     }
   }
 
   post {
-    always {
-      // After the tests run (whether they pass or fail), archive test results
-
-      // Save Cypress videos (for debugging failures)
-      archiveArtifacts artifacts: 'cypress/videos/**/*', allowEmptyArchive: true
-
-      // Save Cypress screenshots (taken on test failures)
-      archiveArtifacts artifacts: 'cypress/screenshots/**/*', allowEmptyArchive: true
+    failure {
+      echo '❌ Build failed. Please check the test reports.'
+    }
+    success {
+      echo '✅ Build succeeded!'
     }
   }
 }
