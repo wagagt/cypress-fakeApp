@@ -8,6 +8,7 @@ pipeline {
   }
 
   stages {
+
     stage('Install dependencies') {
       steps {
         echo '📦 Installing dependencies...'
@@ -30,7 +31,7 @@ pipeline {
         // Borrar reportes anteriores
         sh 'rm -rf cypress/reports/json/*.json cypress/reports/html'
 
-        // Ejecutar Cypress
+        // Ejecutar Cypress con reporter mochawesome
         sh '''
           npx cypress run \
             --spec "cypress/e2e/fakeAppTest/**/*.cy.js" \
@@ -44,8 +45,16 @@ pipeline {
       steps {
         echo '📄 Generating mochawesome HTML report...'
 
+        // Verifica si hay múltiples archivos para mergear
         sh '''
-          npx mochawesome-merge cypress/reports/json/mochawesome_*.json > cypress/reports/json/mochawesome-${BUILD_TS}.json
+          JSON_COUNT=$(ls cypress/reports/json/mochawesome*.json | wc -l)
+          
+          if [ "$JSON_COUNT" -gt 1 ]; then
+            npx mochawesome-merge cypress/reports/json/mochawesome*.json > cypress/reports/json/mochawesome-${BUILD_TS}.json
+          else
+            cp cypress/reports/json/mochawesome*.json cypress/reports/json/mochawesome-${BUILD_TS}.json
+          fi
+
           npx marge cypress/reports/json/mochawesome-${BUILD_TS}.json \
             --reportDir cypress/reports/html \
             --reportFilename mochawesome-${BUILD_TS}
