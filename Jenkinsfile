@@ -1,3 +1,4 @@
+/* groovylint-disable Indentation */
 pipeline {
   agent any
 

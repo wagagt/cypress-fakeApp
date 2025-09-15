@@ -17,7 +17,7 @@ describe('Interceptar llamada a JSONPlaceholder', () => {
       });
     }).as('getUser');
 
-    cy.visit('http://localhost:3000/perfil');
+    cy.visit('http://localhost:8081/perfil');
 
     cy.wait('@getUser').then((interception) => {
       const nombreFinal = interception.response.body.name;
