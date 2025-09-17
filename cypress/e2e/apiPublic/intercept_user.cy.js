@@ -4,7 +4,7 @@ describe('Interceptar llamada a JSONPlaceholder', () => {
     const nombreNuevo = 'Cypress Tester';
 
     cy.intercept('GET', 'https://jsonplaceholder.typicode.com/users/1', (req) => {
-      // Deja que la petición continúe al servidor y espera la respuesta.
+      // Deja que la petición continúe al servidor y espera la respuesta. -test
       req.continue((res) => {
         // 1. Captura el nombre real que viene en la respuesta de la API.
         const nombreReal = res.body.name;
