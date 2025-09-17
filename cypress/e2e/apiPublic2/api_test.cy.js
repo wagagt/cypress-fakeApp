@@ -6,7 +6,7 @@ describe('Separate API test with JSONPlaceholder', () => {
       response = res;
     });
   });
-
+// test commit
   it('returns status 200', () => {
     expect(response.status).to.eq(200);
   });
