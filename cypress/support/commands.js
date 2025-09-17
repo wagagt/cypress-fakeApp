@@ -24,8 +24,16 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('sicatLogin', () => {
-  cy.get('#inputEmail').clear().type('wagagt@gmail.com');
-  cy.get('#inputPassword').clear().type('12345678');
-  cy.contains('button', 'Iniciar sesión').click();
+// Cypress.Commands.add('sicatLogin', () => {
+//   cy.get('#inputEmail').clear().type('wagagt@gmail.com');
+//   cy.get('#inputPassword').clear().type('12345678');
+//   cy.contains('button', 'Iniciar sesión').click();
+// });
+
+// cy.login -> reusable command to log in
+
+Cypress.Commands.add('login', (username, password) => {
+  cy.get('#username').clear().type(username);
+  cy.get('#password').clear().type(password);
+  cy.get('button[type="submit"]').click();
 });

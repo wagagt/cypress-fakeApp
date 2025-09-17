@@ -1,4 +1,4 @@
-/* groovylint-disable Indentation */
+/* groovylint-disable Indentation  - SCM significa Source Control Management, */
 pipeline {
   agent any
 

@@ -22,7 +22,7 @@ describe('Carga de datos - perfil.html', () => {
 });
 
 
-// ✅ API tests añadidos aquí mismo
+// ✅ API tests
 
 describe('API test for list of posts', () => {
   let response;
